@@ -9,7 +9,7 @@ namespace Persistencia.Entidades
     public class Character
     {
 
-        public int ActorMovieId { get; set; }
+        public int CharacterId { get; set; }
         public string CharacterName { get; set; }
         public int MovieId { get; set; }
         public int ActorId { get; set; }
