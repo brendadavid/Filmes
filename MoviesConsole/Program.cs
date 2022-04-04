@@ -105,7 +105,25 @@ namespace MoviesConsoleApp
                 Console.WriteLine("\t {0} \t {1}", res.Nome, res.DatadeNascimento);
             }
 
+            Console.WriteLine("\n5-Mostrar o nome e a data de nascimento do ator mais novo a atuar do Gênero Action");
 
+            var query5 = from p in _db.Characters
+                                    .Include(per => per.Movie)
+                                              .ThenInclude(m => m.Genre)
+                                         .Include("Actor")
+                         where p.Movie.Genre.Name == "Action"
+                         select new
+                         {
+                             Nome = p.Actor.Name,
+                             IdadeAtores = DateTime.Now.Year - p.Actor.DateBirth.Year,
+                             DataNascimento = p.Actor.DateBirth
+                         };
+
+            foreach (var res in query5.OrderBy(i => i.IdadeAtores).Take(1))
+            {
+
+                Console.WriteLine("\t {0} \t {1}", res.Nome, res.DataNascimento);
+            }
 
 
 
