@@ -125,7 +125,24 @@ namespace MoviesConsoleApp
                 Console.WriteLine("\t {0} \t {1}", res.Nome, res.DataNascimento);
             }
 
+            Console.WriteLine("\n6-Mostrar o valor médio das avaliações dos filmes do ator Judi Dench");
 
+            var query6 = from p in _db.Characters
+                                         .Include(per => per.Movie)
+                                           .Include(m => m.Actor).ToList()
+                         where p.Actor.Name == "Judi Dench"
+                         group p by p.Movie.GenreID into grupo
+                         select new
+                         {
+                             Media = grupo.Average(per => per.Movie.Rating)                             
+                         };
+
+
+            foreach (var res in query6)
+            {
+
+                Console.WriteLine("\t Avaliação média: {0}", res.Media);
+            }
 
             //var query14b = from e in query14
             //               group e by e.Genero into grp
