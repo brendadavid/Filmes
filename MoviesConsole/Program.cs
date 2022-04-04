@@ -131,7 +131,7 @@ namespace MoviesConsoleApp
                                          .Include(per => per.Movie)
                                            .Include(m => m.Actor).ToList()
                          where p.Actor.Name == "Judi Dench"
-                         group p by p.Movie.GenreID into grupo
+                         group p by p.Actor.Name into grupo
                          select new
                          {
                              Media = grupo.Average(per => per.Movie.Rating)                             
@@ -143,6 +143,53 @@ namespace MoviesConsoleApp
 
                 Console.WriteLine("\t Avaliação média: {0}", res.Media);
             }
+
+            Console.WriteLine("\n7-Qual o elenco do filme melhor avaliado? ");
+
+            var query7 = from p in _db.Characters
+                                         .Include(per => per.Movie)
+                                           .Include(m => m.Actor).ToList()
+                         //where p.Actor.Name == "Judi Dench"
+                         //group p by p.Movie.GenreID into grupo
+                         select new
+                         {
+                             Elenco = p.Actor.Name,
+                             Avaliacoes = p.Movie.Rating
+                             
+                             
+                         };
+
+
+            foreach (var res in query7.OrderByDescending(a => a.Avaliacoes).Take(7))
+            {
+
+                Console.WriteLine("\t Atores: {0}, \t Avaliação: {1} ", res.Elenco, res.Avaliacoes);
+            }
+
+
+            Console.WriteLine("\n8-Qual o elenco do filme com o menor faturamento? ");
+
+            var query8 = from p in _db.Characters
+                                         .Include(per => per.Movie)
+                                           .Include(m => m.Actor).ToList()
+                             //where p.Actor.Name == "Judi Dench"
+                             //group p by p.Movie.GenreID into grupo
+                         select new
+                         {
+                             Elenco = p.Actor.Name,
+                             Faturamento = p.Movie.Gross
+
+                         };
+
+
+            foreach (var res in query8.OrderBy(a => a.Faturamento).Take(3))
+            {
+
+                Console.WriteLine("\t Atores: {0}, \t Faturamento: {1} ", res.Elenco, res.Faturamento);
+            }
+
+
+
 
             //var query14b = from e in query14
             //               group e by e.Genero into grp
