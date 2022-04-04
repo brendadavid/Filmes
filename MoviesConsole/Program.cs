@@ -16,7 +16,7 @@ namespace MoviesConsoleApp
 
             // Mostrar o nome de todos os gêneros que um determinado ator atuou
             // e o número de filmes neste gênero
-            Console.WriteLine("\nGeneros que a atriz Judi Dench atuou");
+
             //var query14 = from p in _db.Characters
             //                             .Include("Movie")
             //                             .Include("Actor")
@@ -27,6 +27,7 @@ namespace MoviesConsoleApp
             //                  Genero = genero.Name,
             //                  p.Movie.Title
             //              };
+            Console.WriteLine("\n1 - Listar o nome de todos personagens desempenhados por Judi Dench, incluindo título do filme e o diretor");
 
             var query1 = from p in _db.Characters
                                          .Include(per => per.Movie)
@@ -50,7 +51,7 @@ namespace MoviesConsoleApp
             }
 
 
-            Console.WriteLine("\nMostrar o nome e idade de todos atores que já atuaram como James Bond");
+            Console.WriteLine("\n2- Mostrar o nome e idade de todos atores que já atuaram como James Bond");
 
             var query2 = from p in _db.Characters
                                     .Include(per => per.Actor)
@@ -63,9 +64,48 @@ namespace MoviesConsoleApp
 
             foreach (var res in query2.Distinct())
             {
-
+              
                 Console.WriteLine("\t {0} \t {1}", res.Nome, res.IdadeAtores);
             }
+
+            Console.WriteLine("\n3- Informar qual o ator desempenhou mais vezes o papel de James Bond");
+
+            var query3 = from p in _db.Characters
+                                    .Include(per => per.Actor)
+                         where p.CharacterName == "James Bond"  
+                         group p by p.Actor.Name into grupo
+                         select new
+                         {
+                             NomeAtor = grupo.Key,
+                             NomePersonagem = grupo.Count(),                                                         
+                         };
+            
+
+            foreach (var res in query3.OrderByDescending(n => n.NomePersonagem).Take(1))
+            {
+
+                Console.WriteLine("\t {0}", res.NomeAtor);
+            }
+
+
+            Console.WriteLine("\n4-Mostrar o nome e a data de nascimento de todos atores que já atuaram como Darth Vader");
+
+            var query4 = from p in _db.Characters
+                                    .Include(per => per.Actor)
+                         where p.CharacterName == "Darth Vader"
+                         select new
+                         {
+                             Nome = p.Actor.Name,
+                             DatadeNascimento = p.Actor.DateBirth
+                         };
+
+            foreach (var res in query4.Distinct())
+            {
+
+                Console.WriteLine("\t {0} \t {1}", res.Nome, res.DatadeNascimento);
+            }
+
+
 
 
 
