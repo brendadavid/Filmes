@@ -14,40 +14,26 @@ namespace MoviesConsoleApp
 
             MovieContext _db = new MovieContext();
 
-            // Mostrar o nome de todos os gêneros que um determinado ator atuou
-            // e o número de filmes neste gênero
-
-            //var query14 = from p in _db.Characters
-            //                             .Include("Movie")
-            //                             .Include("Actor")
-            //              join genero in _db.Genres on p.Movie.GenreID equals genero.GenreId
-            //              where p.Actor.Name == "Judi Dench"
-            //              select new
-            //              {
-            //                  Genero = genero.Name,
-            //                  p.Movie.Title
-            //              };
             Console.WriteLine("\n1 - Listar o nome de todos personagens desempenhados por Judi Dench, incluindo título do filme e o diretor");
 
             var query1 = from p in _db.Characters
                                          .Include(per => per.Movie)
                                               .ThenInclude(m => m.Genre)
                                          .Include("Actor")
-                              //     join genero in _db.Genres on p.Movie.GenreID equals genero.GenreId
-                          where p.Actor.Name == "Judi Dench"
-                          select new
-                          {
-                              Genero = p.Movie.Genre.Name,
-                              Personagem = p.CharacterName,
-                              Diretor = p.Movie.Director,
-                              p.Movie.Title
-                          };
+                         where p.Actor.Name == "Judi Dench"
+                         select new
+                         {
+                             Genero = p.Movie.Genre.Name,
+                             Personagem = p.CharacterName,
+                             Diretor = p.Movie.Director,
+                             p.Movie.Title
+                         };
 
 
             foreach (var res in query1)
             {
 
-                Console.WriteLine("\t {0} \t {1} \t {2} \t {3}", res.Personagem, res.Genero, res.Title, res.Diretor);
+                Console.WriteLine("\t {0} \t {1} \t {2} \t {3} ", res.Personagem, res.Genero, res.Title, res.Diretor);
             }
 
 
@@ -56,7 +42,7 @@ namespace MoviesConsoleApp
             var query2 = from p in _db.Characters
                                     .Include(per => per.Actor)
                          where p.CharacterName == "James Bond"
-                         select new 
+                         select new
                          {
                              Nome = p.Actor.Name,
                              IdadeAtores = DateTime.Now.Year - p.Actor.DateBirth.Year
@@ -64,22 +50,22 @@ namespace MoviesConsoleApp
 
             foreach (var res in query2.Distinct())
             {
-              
-                Console.WriteLine("\t {0} \t {1}", res.Nome, res.IdadeAtores);
+
+                Console.WriteLine("\t {0} {1}", res.Nome, res.IdadeAtores);
             }
 
             Console.WriteLine("\n3- Informar qual o ator desempenhou mais vezes o papel de James Bond");
 
             var query3 = from p in _db.Characters
                                     .Include(per => per.Actor)
-                         where p.CharacterName == "James Bond"  
+                         where p.CharacterName == "James Bond"
                          group p by p.Actor.Name into grupo
                          select new
                          {
                              NomeAtor = grupo.Key,
-                             NomePersonagem = grupo.Count(),                                                         
+                             NomePersonagem = grupo.Count(),
                          };
-            
+
 
             foreach (var res in query3.OrderByDescending(n => n.NomePersonagem).Take(1))
             {
@@ -134,7 +120,7 @@ namespace MoviesConsoleApp
                          group p by p.Actor.Name into grupo
                          select new
                          {
-                             Media = grupo.Average(per => per.Movie.Rating)                             
+                             Media = grupo.Average(per => per.Movie.Rating)
                          };
 
 
@@ -145,71 +131,77 @@ namespace MoviesConsoleApp
             }
 
             Console.WriteLine("\n7-Qual o elenco do filme melhor avaliado? ");
-
-            var query7 = from p in _db.Characters
+            
+            var query7a = from p in _db.Characters
                                          .Include(per => per.Movie)
                                            .Include(m => m.Actor).ToList()
-                         //where p.Actor.Name == "Judi Dench"
-                         //group p by p.Movie.GenreID into grupo
-                         select new
+                             select new
                          {
-                             Elenco = p.Actor.Name,
-                             Avaliacoes = p.Movie.Rating
-                             
-                             
+                             Titulo = p.Movie.Title,
+                             Avaliacao = p.Movie.Rating
                          };
-
-
-            foreach (var res in query7.OrderByDescending(a => a.Avaliacoes).Take(7))
+            foreach (var res in query7a.OrderByDescending(a => a.Avaliacao).Take(1))
             {
 
-                Console.WriteLine("\t Atores: {0}, \t Avaliação: {1} ", res.Elenco, res.Avaliacoes);
+                Console.WriteLine("\t Titulo: {0}, \n\t Avaliação: {1}", res.Titulo, res.Avaliacao);
+            }
+
+            var subquery = query7a.OrderByDescending(a => a.Avaliacao).Take(1).First();
+
+            string titulo7a = subquery.Titulo;
+            var query7b = from p in _db.Characters
+                                        .Include(per => per.Movie)
+                                          .Include(m => m.Actor).ToList()
+                          where p.Movie.Title == titulo7a
+                         select new
+                         {
+                             Elenco = p.Actor.Name
+                         };
+
+            foreach (var res in query7b)
+            {
+
+                Console.WriteLine("\t Elenco: {0}", res.Elenco);
             }
 
 
             Console.WriteLine("\n8-Qual o elenco do filme com o menor faturamento? ");
 
-            var query8 = from p in _db.Characters
+            var query8a = from p in _db.Characters
                                          .Include(per => per.Movie)
                                            .Include(m => m.Actor).ToList()
-                             //where p.Actor.Name == "Judi Dench"
-                             //group p by p.Movie.GenreID into grupo
-                         select new
-                         {
-                             Elenco = p.Actor.Name,
+                            select new
+                            {
+                             Titulo = p.Movie.Title,
                              Faturamento = p.Movie.Gross
-
                          };
 
-
-            foreach (var res in query8.OrderBy(a => a.Faturamento).Take(3))
+            foreach (var res in query8a.OrderBy(a => a.Faturamento).Take(1))
             {
 
-                Console.WriteLine("\t Atores: {0}, \t Faturamento: {1} ", res.Elenco, res.Faturamento);
+                Console.WriteLine("\t Titulo: {0}, \n\t Faturamento: {1}", res.Titulo, res.Faturamento);
             }
 
+            var subquery2 = query8a.OrderBy(a => a.Faturamento).Take(1).First();
+ 
+            string titulo8a = subquery2.Titulo;
+            var query8b = from p in _db.Characters
+                                        .Include(per => per.Movie)
+                                          .Include(m => m.Actor).ToList()
 
+                          where p.Movie.Title == titulo8a
+                          select new
+                          {
+                              Elenco = p.Actor.Name
+                          };
 
+            foreach (var res in query8b)
+            {
 
-            //var query14b = from e in query14
-            //               group e by e.Genero into grp
-            //               select new
-            //               {
-            //                   Gen = grp.Key,
-            //                   Quant = grp.Count()
-            //               };
-
-
-            //Console.WriteLine("\nTotal por genero...");
-            //foreach (var res in query14b)
-            //{
-
-            //    Console.WriteLine("\t {0} \t {1}", res.Gen, res.Quant);
-            //}
-
+                Console.WriteLine("\t Elenco: {0}", res.Elenco);
+            }
 
             Console.ReadKey();
-
 
         }
 
